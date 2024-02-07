@@ -25,14 +25,28 @@ app.use (session({
     saveUninitialized: true
 }));
 
-MongoClient.connect(mongoURL, {useNewUrlParser: true, useUnifiedTopology: true}, (err, client) => {
+MongoClient.connect(mongoURL, (err, client) => {
   if (err) {
     console.error('Error connecting to MongoDB:', err);
   } else {
     console.log('Connected to MongoDB');
     const db = client.db();
 
-    // Set the database instance for the router
+    // Log the number of items in the collection
+    const storeItemsCollection = db.collection('storeItems');
+    storeItemsCollection.insertMany([
+      { name: 'Item 1', price: 10 },
+      { name: 'Item 2', price: 20 },
+      // Add more items as needed
+    ], (insertErr, result) => {
+      if (insertErr) {
+        console.error('Error inserting store items:', insertErr);
+      } else {
+        console.log('Number of items inserted:', result.insertedCount);
+      }
+    });
+
+       // Set the database instance for the router
     setDatabase(db);
 
     app.use('/route', router);
